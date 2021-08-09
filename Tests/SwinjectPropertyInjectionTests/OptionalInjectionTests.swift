@@ -1,14 +1,19 @@
+//
+//  OptionalInjectionTests.swift
+//  
+//
+//  Created by Wang Kunzhen on 9/8/21.
+//
+
 import XCTest
 import Swinject
 @testable import SwinjectPropertyInjection
 
-final class SwinjectPropertyInjectionTests: XCTestCase {
+final class OptionalInjectionTests: XCTestCase {
     private var container: Container!
     
     override func setUp() {
         container = Container(defaultObjectScope: .container)
-        container.register(Manager.self, factory: { _ in Manager() })
-        
         ResolverContainer.shared.set(resolver: container)
     }
     
@@ -18,27 +23,24 @@ final class SwinjectPropertyInjectionTests: XCTestCase {
     
     func testResolveShouldSucceed() {
         let host = Host()
-        XCTAssertNotNil(host.manager)
+        XCTAssertNil(host.manager)
+        
+        container.register(Manager.self, factory: { _ in Manager() })
+        let host2 = Host()
+        XCTAssertNotNil(host2.manager)
     }
     
-    func testResolveShouldKeepOldScopeAsContainer() {
-        let host1 = Host()
-        let host2 = Host()
-        XCTAssertEqual(host1.manager.uuid, host2.manager.uuid)
-    }
-
     static var allTests = [
-        ("testResolveShouldSucceed", testResolveShouldSucceed),
-        ("testResolveShouldKeepOldScopeAsContainer", testResolveShouldKeepOldScopeAsContainer)
+        ("testResolveShouldSucceed", testResolveShouldSucceed)
     ]
 }
 
-extension SwinjectPropertyInjectionTests {
+extension OptionalInjectionTests {
     private class Manager {
         let uuid = UUID().uuidString
     }
     
     private class Host {
-        @Injected var manager: Manager
+        @OptionalInjected var manager: Manager?
     }
 }

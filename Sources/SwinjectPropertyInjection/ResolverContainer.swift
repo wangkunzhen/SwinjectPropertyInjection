@@ -29,6 +29,8 @@ public final class ResolverContainer {
     public func reset() {
         self._resolver = nil
     }
+    
+    var hasResolver: Bool { _resolver != nil }
 }
 
 extension ResolverContainer: Resolver {
