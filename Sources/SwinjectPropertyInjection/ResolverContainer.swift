@@ -9,28 +9,50 @@ import Foundation
 import Swinject
 
 public final class ResolverContainer {
+    private typealias ResolverFactory = () -> Resolver
     
     public static let shared = ResolverContainer()
     
     private var _resolver: Resolver?
+    private var _resolverFactory: ResolverFactory?
     
     private var resolver: Resolver {
-        guard let r = _resolver else {
-            fatalError("You need to call `set(resolver:)` before resolving.")
+        if let r = _resolver {
+            return r
         }
         
-        return r
+        if let rf = _resolverFactory {
+            return rf()
+        }
+        
+        fatalError("You need to call `set(resolver:)` before resolving.")
     }
     
+    /**
+     Configure the resolver intance to be used for the property wrappers. Setting this will remove the previously set resolverFactory if any.
+     */
     public func set(resolver: Resolver) {
         self._resolver = resolver
+        self._resolverFactory = nil
     }
     
-    public func reset() {
+    /**
+     Configure the factory that generates a resolver instance to be used for the property wrappers. Setting this will remove the previously set resolver if any.
+     */
+    public func set(resolverFactory: @escaping () -> Resolver) {
+        self._resolverFactory = resolverFactory
         self._resolver = nil
     }
     
-    var hasResolver: Bool { _resolver != nil }
+    /**
+     Remove all resolver and resolverFactory records if any. 
+     */
+    public func reset() {
+        self._resolver = nil
+        self._resolverFactory = nil
+    }
+    
+    var hasResolver: Bool { _resolver != nil || _resolverFactory != nil }
 }
 
 extension ResolverContainer: Resolver {
