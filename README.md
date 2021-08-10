@@ -40,3 +40,33 @@ class MainViewModel {
     @OptionalInjected private var manager: Manager?
 }
 ```
+
+### Named Injection
+#### @Injected
+```swift
+class MainViewModel {
+    @Injected(name: "Manager1") private var manager: Manager
+}
+```
+
+#### @OptionalInjected
+```swift
+class MainViewModel {
+    @OptionalInjected(name: "Manager1") private var manager: Manager?
+}
+```
+
+### Parametric Injection
+#### @Injected
+```swift
+class MainViewModel {
+    @Injected(argument: 1) private var manager: Manager
+}
+```
+
+#### @OptionalInjected
+```swift
+class MainViewModel {
+    @OptionalInjected(argument: 1) private var manager: Manager?
+}
+```
