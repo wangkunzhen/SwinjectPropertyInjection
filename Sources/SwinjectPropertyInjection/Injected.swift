@@ -6,21 +6,58 @@
 //
 
 import Foundation
+import Swinject
 
 @propertyWrapper
 public struct Injected<Service> {
     private var service: Service
     
     public init() {
-        guard ResolverContainer.shared.hasResolver else {
-            fatalError("`ResolverContainer.shared.set(resolver:)` needs to be called first.")
-        }
+        let resolver = Self.serviceResolver()
         
-        guard let service = ResolverContainer.shared.resolve(Service.self) else {
+        guard let service = resolver.resolve(Service.self) else {
             fatalError("Service of type \(Service.self) not found. You can try `OptionalInjected` instead.")
         }
         
         self.service = service
+    }
+    
+    public init(name: String?) {
+        let resolver = Self.serviceResolver()
+        
+        guard let service = resolver.resolve(Service.self, name: name) else {
+            fatalError("Service of type \(Service.self) not found. You can try `OptionalInjected` instead.")
+        }
+        
+        self.service = service
+    }
+    
+    public init<Arg1>(argument arg1: Arg1) {
+        let resolver = Self.serviceResolver()
+        
+        guard let service = resolver.resolve(Service.self, argument: arg1) else {
+            fatalError("Service of type \(Service.self) not found. You can try `OptionalInjected` instead.")
+        }
+        
+        self.service = service
+    }
+    
+    public init<Arg1>(name: String?, argument arg1: Arg1) {
+        let resolver = Self.serviceResolver()
+        
+        guard let service = resolver.resolve(Service.self, name: name, argument: arg1) else {
+            fatalError("Service of type \(Service.self) not found. You can try `OptionalInjected` instead.")
+        }
+        
+        self.service = service
+    }
+    
+    private static func serviceResolver() -> Resolver {
+        guard ResolverContainer.shared.hasResolver else {
+            fatalError("`ResolverContainer.shared.set(resolver:)` needs to be called first.")
+        }
+        
+        return ResolverContainer.shared
     }
     
     public var wrappedValue: Service {

@@ -22,25 +22,14 @@ final class OptionalInjectionTests: XCTestCase {
     }
     
     func testResolveShouldSucceed() {
-        let host = Host()
-        XCTAssertNil(host.manager)
+        let host = Host3()
+        XCTAssertNil(host.fooManager)
         
-        container.register(Manager.self, factory: { _ in Manager() })
-        let host2 = Host()
-        XCTAssertNotNil(host2.manager)
-    }
-    
-    static var allTests = [
-        ("testResolveShouldSucceed", testResolveShouldSucceed)
-    ]
-}
-
-extension OptionalInjectionTests {
-    private class Manager {
-        let uuid = UUID().uuidString
-    }
-    
-    private class Host {
-        @OptionalInjected var manager: Manager?
+        let fooManager = FooManager()
+        container.register(FooManagerProtocol.self, factory: { _ in fooManager })
+        
+        let host2 = Host3()
+        XCTAssertNotNil(host2.fooManager)
+        XCTAssertEqual(host2.fooManager?.uuid, fooManager.uuid)
     }
 }

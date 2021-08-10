@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Swinject
 
 @propertyWrapper
 public struct OptionalInjected<Service> {
@@ -17,6 +18,32 @@ public struct OptionalInjected<Service> {
         }
         
         self.service = ResolverContainer.shared.resolve(Service.self)
+    }
+    
+    public init(name: String?) {
+        let resolver = Self.serviceResolver()
+        
+        self.service = resolver.resolve(Service.self, name: name)
+    }
+    
+    public init<Arg1>(argument arg1: Arg1) {
+        let resolver = Self.serviceResolver()
+        
+        self.service = resolver.resolve(Service.self, argument: arg1)
+    }
+    
+    public init<Arg1>(name: String?, argument arg1: Arg1) {
+        let resolver = Self.serviceResolver()
+        
+        self.service = resolver.resolve(Service.self, name: name, argument: arg1)
+    }
+    
+    private static func serviceResolver() -> Resolver {
+        guard ResolverContainer.shared.hasResolver else {
+            fatalError("`ResolverContainer.shared.set(resolver:)` needs to be called first.")
+        }
+        
+        return ResolverContainer.shared
     }
     
     public var wrappedValue: Service? {
